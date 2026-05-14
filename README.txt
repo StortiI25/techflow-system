@@ -1,4 +1,4 @@
-# TechFlow Sistema TOP - PIM III
+# EstoqueFlow Sistema TOP - PIM III
 
 ## Login padrão
 admin@techflow.com
@@ -27,3 +27,12 @@ http://127.0.0.1:5000
 - Chart.js
 - VLibras visual
 - Responsividade
+
+
+## Alterações desta versão
+- Sistema reposicionado como Gerenciamento de Estoque
+- Login inicial sem e-mail/senha preenchidos
+- Mobile melhorado com sidebar recolhível
+- Tabelas com rolagem horizontal no celular
+- Botão oficial VLibras funcional
+- Textos de vendas ajustados para movimentações/saída de estoque
