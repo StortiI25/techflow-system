@@ -1,38 +1,32 @@
-# EstoqueFlow Sistema TOP - PIM III
+# EstoqueFlow - Sistema Completo Corrigido
 
-## Login padrão
-admin@techflow.com
-admin123
+## Login padrão do administrador
+E-mail: admin@estoqueflow.com
+Senha: admin123
 
-## Como rodar
+## Como rodar localmente
 py -m pip install -r requirements.txt
 py app.py
 
 Abra:
-http://127.0.0.1:5000
+http://127.0.0.1:10000
 
-## O que foi adicionado
-- Dashboard moderno dark/light
-- SQLite
-- Login seguro com senha criptografada
-- Cadastro, edição, exclusão e busca
-- Permissões: admin, funcionário e visualizador
-- Venda com carrinho de múltiplos produtos
-- Estoque baixo automático
-- Relatórios com exportação CSV e impressão/PDF
-- Perfil do usuário
-- Histórico de ações
-- Página Sobre o Projeto PIM
-- Bootstrap 5
-- Chart.js
-- VLibras visual
-- Responsividade
+## Deploy no Render
+Build Command:
+pip install -r requirements.txt
 
+Start Command:
+python app.py
 
-## Alterações desta versão
-- Sistema reposicionado como Gerenciamento de Estoque
-- Login inicial sem e-mail/senha preenchidos
-- Mobile melhorado com sidebar recolhível
-- Tabelas com rolagem horizontal no celular
-- Botão oficial VLibras funcional
-- Textos de vendas ajustados para movimentações/saída de estoque
+## Correções incluídas
+- Modo escuro com letras brancas
+- Login sem e-mail e senha preenchidos na tela
+- Clientes com nomes de empresas para simulação
+- Produtos reais
+- Movimentações automáticas
+- Dashboard já inicia com dados
+- Gráficos preenchidos
+- Estoque baixo funcionando
+- VLibras funcional
+- Mobile melhorado
+- Porta corrigida para Render

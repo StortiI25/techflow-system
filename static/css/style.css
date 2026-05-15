@@ -151,3 +151,74 @@
 [vw-plugin-wrapper]{
   z-index:2000 !important;
 }
+
+
+/* ===== Correção definitiva do modo escuro ===== */
+[data-theme="dark"]{
+  --text:#ffffff !important;
+  --muted:#e2e8f0 !important;
+  --surface:#111c2d !important;
+  --surface2:#152235 !important;
+}
+
+[data-theme="dark"] body,
+[data-theme="dark"] .content,
+[data-theme="dark"] .panel,
+[data-theme="dark"] .sidebar,
+[data-theme="dark"] .topbar,
+[data-theme="dark"] .page-title,
+[data-theme="dark"] .kpi-card,
+[data-theme="dark"] .auth-card,
+[data-theme="dark"] .feature-card {
+  color:#ffffff !important;
+}
+
+[data-theme="dark"] h1,
+[data-theme="dark"] h2,
+[data-theme="dark"] h3,
+[data-theme="dark"] h4,
+[data-theme="dark"] h5,
+[data-theme="dark"] h6,
+[data-theme="dark"] p,
+[data-theme="dark"] label,
+[data-theme="dark"] span,
+[data-theme="dark"] strong,
+[data-theme="dark"] small,
+[data-theme="dark"] td,
+[data-theme="dark"] th,
+[data-theme="dark"] a {
+  color:#ffffff !important;
+}
+
+[data-theme="dark"] .text-muted,
+[data-theme="dark"] .page-title p,
+[data-theme="dark"] .kpi-card p,
+[data-theme="dark"] .sidebar-footer small,
+[data-theme="dark"] .userbox small {
+  color:#e2e8f0 !important;
+}
+
+[data-theme="dark"] .form-control,
+[data-theme="dark"] select,
+[data-theme="dark"] textarea {
+  background:#152235 !important;
+  color:#ffffff !important;
+  border-color:#334155 !important;
+}
+
+[data-theme="dark"] .form-control::placeholder,
+[data-theme="dark"] textarea::placeholder {
+  color:#cbd5e1 !important;
+}
+
+[data-theme="dark"] .table-tech,
+[data-theme="dark"] .table-tech td,
+[data-theme="dark"] .table-tech th {
+  color:#ffffff !important;
+  background:transparent !important;
+}
+
+[data-theme="dark"] .btn-warning,
+[data-theme="dark"] .badge.bg-warning {
+  color:#111827 !important;
+}

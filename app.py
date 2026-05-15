@@ -6,7 +6,6 @@ from pathlib import Path
 from functools import wraps
 import csv
 import io
-import os
 
 app = Flask(__name__)
 app.secret_key = "techflow_pim_top_secret"
@@ -79,22 +78,69 @@ def init_db():
         data_hora TEXT NOT NULL
     )""")
 
-    if not cur.execute("SELECT id FROM usuarios WHERE email=?", ("admin@techflow.com",)).fetchone():
+    if not cur.execute("SELECT id FROM usuarios WHERE email=?", ("admin@estoqueflow.com",)).fetchone():
         cur.execute("INSERT INTO usuarios(nome,email,senha,perfil,criado_em) VALUES(?,?,?,?,?)",
-                    ("Administrador","admin@techflow.com",generate_password_hash("admin123"),"admin",datetime.now().isoformat()))
+                    ("Administrador","admin@estoqueflow.com",generate_password_hash("admin123"),"admin",datetime.now().isoformat()))
 
     if not cur.execute("SELECT id FROM clientes LIMIT 1").fetchone():
-        for c in [("Carlos Silva","carlos@email.com","11999990000","São Paulo"),
-                  ("Ana Souza","ana@email.com","11988887777","Campinas"),
-                  ("Marcos Lima","marcos@email.com","11977776666","Santos")]:
+        clientes = [
+            ("Mercado Central LTDA", "contato@mercadocentral.com", "1132458899", "São Paulo"),
+            ("TechNova Soluções", "financeiro@technova.com", "11987654321", "Campinas"),
+            ("Alpha Distribuidora", "vendas@alphadistribuidora.com", "1140028922", "Guarulhos"),
+            ("Loja Prime Imports", "contato@primeimports.com", "11999887766", "Santos"),
+            ("Digital Max Comércio", "suporte@digitalmax.com", "1130304040", "Sorocaba")
+        ]
+        for c in clientes:
             cur.execute("INSERT INTO clientes(nome,email,telefone,endereco,criado_em) VALUES(?,?,?,?,?)", (*c, datetime.now().isoformat()))
 
     if not cur.execute("SELECT id FROM produtos LIMIT 1").fetchone():
-        for p in [("Sistema de Controle Mensal","Software",199.90,10,3),
-                  ("Consultoria de UX","Serviço",450.00,5,2),
-                  ("Dashboard Analítico","Software",299.90,8,3),
-                  ("Treinamento Operacional","Serviço",350.00,6,2)]:
+        produtos = [
+            ("Notebook Dell Inspiron 15", "Informática", 3899.90, 12, 3),
+            ("Monitor LG UltraWide 29", "Periféricos", 1299.90, 8, 2),
+            ("Teclado Mecânico Redragon", "Periféricos", 249.90, 20, 5),
+            ("Mouse Logitech G203", "Periféricos", 159.90, 18, 5),
+            ("SSD Kingston 1TB", "Hardware", 499.90, 14, 4),
+            ("Memória RAM Corsair 16GB", "Hardware", 329.90, 10, 3),
+            ("Impressora Epson EcoTank", "Escritório", 1199.90, 6, 2),
+            ("Cadeira Gamer ThunderX3", "Móveis", 899.90, 5, 2)
+        ]
+        for p in produtos:
             cur.execute("INSERT INTO produtos(nome,categoria,preco,estoque,estoque_minimo,criado_em) VALUES(?,?,?,?,?,?)", (*p, datetime.now().isoformat()))
+
+    if not cur.execute("SELECT id FROM vendas LIMIT 1").fetchone():
+        movimentacoes = [
+            (1, 1, "2026-05-10", [(1, 1), (2, 1)]),
+            (2, 1, "2026-05-11", [(3, 2), (4, 3)]),
+            (3, 1, "2026-05-12", [(5, 2), (6, 1)]),
+            (4, 1, "2026-05-13", [(7, 1)]),
+            (5, 1, "2026-05-14", [(8, 1), (4, 2)])
+        ]
+        for cliente_id, usuario_id, data_venda, itens in movimentacoes:
+            total = 0
+            itens_calculados = []
+            for produto_id, quantidade in itens:
+                produto = cur.execute("SELECT preco FROM produtos WHERE id=?", (produto_id,)).fetchone()
+                preco = produto["preco"] if produto else 0
+                subtotal = preco * quantidade
+                total += subtotal
+                itens_calculados.append((produto_id, quantidade, preco, subtotal))
+            cur.execute("INSERT INTO vendas(cliente_id,usuario_id,total,data_venda) VALUES(?,?,?,?)",
+                        (cliente_id, usuario_id, total, data_venda))
+            venda_id = cur.lastrowid
+            for produto_id, quantidade, preco, subtotal in itens_calculados:
+                cur.execute("INSERT INTO venda_itens(venda_id,produto_id,quantidade,preco_unitario,subtotal) VALUES(?,?,?,?,?)",
+                            (venda_id, produto_id, quantidade, preco, subtotal))
+                cur.execute("UPDATE produtos SET estoque = estoque - ? WHERE id = ?", (quantidade, produto_id))
+
+    if not cur.execute("SELECT id FROM logs LIMIT 1").fetchone():
+        logs_iniciais = [
+            ("Sistema", "Banco de dados inicializado com empresas e produtos reais"),
+            ("Administrador", "Cadastro inicial de produtos importado"),
+            ("Administrador", "Movimentações simuladas adicionadas ao sistema")
+        ]
+        for usuario, acao in logs_iniciais:
+            cur.execute("INSERT INTO logs(usuario,acao,data_hora) VALUES(?,?,?)",
+                        (usuario, acao, datetime.now().strftime("%d/%m/%Y %H:%M:%S")))
 
     conn.commit()
     conn.close()
@@ -386,8 +432,8 @@ def api_dashboard():
         "cat_valores":[r["qtd"] for r in categorias]
     })
 
-
 if __name__ == "__main__":
+    import os
     init_db()
     port = int(os.environ.get("PORT", 10000))
     app.run(host="0.0.0.0", port=port, debug=False)
