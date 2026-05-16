@@ -63,13 +63,13 @@
     Exportar
   </button>
 
-  <button class="btn btn-primary new-client-btn" type="button" data-bs-toggle="collapse" data-bs-target="#novoCliente">
+  {% if can_write %}<button class="btn btn-primary new-client-btn" type="button" data-bs-toggle="collapse" data-bs-target="#novoCliente">
     <i class="bi bi-plus-lg"></i>
     Novo cliente
-  </button>
+  </button>{% endif %}
 </div>
 
-<div class="collapse mb-4" id="novoCliente">
+{% if can_write %}<div class="collapse mb-4" id="novoCliente">
   <form method="post" class="panel modern-client-form">
     <h4>Novo cliente</h4>
     <div class="row g-3">
@@ -88,7 +88,7 @@
     </div>
     <button class="btn btn-primary mt-3">Cadastrar cliente</button>
   </form>
-</div>
+</div>{% endif %}
 
 <div class="clients-table-card">
   <div class="table-responsive">
@@ -131,9 +131,9 @@
                 <i class="bi bi-clock-history"></i>
                 Histórico
               </a>
-              <a class="icon-action edit" href="/clientes/editar/{{ c.id }}" title="Editar">
+              {% if can_write %}<a class="icon-action edit" href="/clientes/editar/{{ c.id }}" title="Editar">
                 <i class="bi bi-pencil"></i>
-              </a>
+              </a>{% endif %}
               {% if usuario_perfil == 'admin' %}
               <a class="icon-action delete" href="/clientes/excluir/{{ c.id }}" title="Excluir">
                 <i class="bi bi-trash"></i>

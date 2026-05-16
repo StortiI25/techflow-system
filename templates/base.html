@@ -40,7 +40,7 @@
           <button class="user-dropdown" type="button" data-bs-toggle="dropdown" aria-expanded="false">
             <div class="userbox">
               <strong>{{ usuario_nome }}</strong>
-              <small>{{ usuario_perfil }}</small>
+              <small>{{ 'trabalhador' if usuario_perfil == 'funcionario' else usuario_perfil }}</small>
             </div>
             <div class="avatar">{{ usuario_nome[0]|upper }}</div>
             <i class="bi bi-chevron-down"></i>

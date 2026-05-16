@@ -47,8 +47,8 @@
   </div>
 </div>
 
-<div class="mov-layout">
-  <div class="mov-left">
+<div class="mov-layout {% if not can_write %}readonly-layout{% endif %}">
+  {% if can_write %}<div class="mov-left">
     <div class="mov-card barcode-card">
       <div class="section-label">
         <i class="bi bi-upc-scan"></i>
@@ -118,7 +118,7 @@
         Saídas não podem exceder o estoque disponível.
       </div>
     </form>
-  </div>
+  </div>{% endif %}
 
   <div class="mov-right">
     <div class="mov-table-card">

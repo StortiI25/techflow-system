@@ -50,12 +50,30 @@ def admin_required(f):
         return f(*args, **kwargs)
     return wrapper
 
+
+def write_required(f):
+    @wraps(f)
+    def wrapper(*args, **kwargs):
+        if session.get("usuario_perfil") == "visualizador":
+            flash("Perfil visualizador possui acesso somente leitura.", "warning")
+            return redirect(request.referrer or url_for("dashboard"))
+        return f(*args, **kwargs)
+    return wrapper
+
+def can_write():
+    return session.get("usuario_perfil") in ["admin", "funcionario"]
+
+def is_admin():
+    return session.get("usuario_perfil") == "admin"
+
 @app.context_processor
 def inject_global():
     return {
         "usuario_nome": session.get("usuario_nome"),
         "usuario_perfil": session.get("usuario_perfil"),
-        "request": request
+        "request": request,
+        "can_write": can_write(),
+        "is_admin": is_admin()
     }
 
 def init_db():
@@ -290,6 +308,10 @@ def clientes():
     conn = get_db()
 
     if request.method == "POST":
+        if not can_write():
+            conn.close()
+            flash("Perfil visualizador possui acesso somente leitura.", "warning")
+            return redirect(url_for("clientes"))
         conn.execute(
             "INSERT INTO clientes(nome,email,telefone,endereco,criado_em) VALUES(?,?,?,?,?)",
             (
@@ -356,6 +378,10 @@ def cliente_detalhe(id):
 def editar_cliente(id):
     conn = get_db()
     if request.method == "POST":
+        if not can_write():
+            conn.close()
+            flash("Perfil visualizador possui acesso somente leitura.", "warning")
+            return redirect(url_for("clientes"))
         conn.execute("UPDATE clientes SET nome=?,email=?,telefone=?,endereco=? WHERE id=?",
                      (request.form["nome"],request.form["email"],request.form["telefone"],request.form["endereco"],id))
         conn.commit()
@@ -382,6 +408,10 @@ def excluir_cliente(id):
 def produtos():
     conn = get_db()
     if request.method == "POST":
+        if not can_write():
+            conn.close()
+            flash("Perfil visualizador possui acesso somente leitura.", "warning")
+            return redirect(url_for("produtos"))
         conn.execute("""
             INSERT INTO produtos(codigo_barras,nome,categoria,preco_custo,preco_venda,estoque,estoque_minimo,criado_em)
             VALUES(?,?,?,?,?,?,?,?)
@@ -411,6 +441,10 @@ def produto_por_codigo(codigo):
 def editar_produto(id):
     conn = get_db()
     if request.method == "POST":
+        if not can_write():
+            conn.close()
+            flash("Perfil visualizador possui acesso somente leitura.", "warning")
+            return redirect(url_for("produtos"))
         conn.execute("UPDATE produtos SET codigo_barras=?,nome=?,categoria=?,preco_custo=?,preco_venda=?,estoque=?,estoque_minimo=? WHERE id=?",
                      (request.form["codigo_barras"],request.form["nome"],request.form["categoria"],float(request.form["preco_custo"]),float(request.form["preco_venda"]),int(request.form["estoque"]),int(request.form["estoque_minimo"]),id))
         conn.commit()
@@ -438,6 +472,10 @@ def movimentacoes():
     conn = get_db()
 
     if request.method == "POST":
+        if not can_write():
+            conn.close()
+            flash("Perfil visualizador possui acesso somente leitura.", "warning")
+            return redirect(url_for("movimentacoes"))
         produto_id = request.form["produto_id"]
         tipo = request.form["tipo"]
         motivo = request.form["motivo"]

@@ -14,6 +14,13 @@
   </button>
 </div>
 
+
+<div class="hierarchy-panel">
+  <div class="hierarchy-card admin"><strong>Administrador</strong><p>Pode cadastrar, editar, excluir, movimentar, gerar relatórios e gerenciar usuários.</p></div>
+  <div class="hierarchy-card worker"><strong>Trabalhador</strong><p>Pode cadastrar clientes/produtos e registrar movimentações, mas não exclui dados nem gerencia usuários.</p></div>
+  <div class="hierarchy-card viewer"><strong>Visualizador</strong><p>Acesso somente leitura: consulta dashboards, estoque, clientes, relatórios e auditoria.</p></div>
+</div>
+
 <div class="user-kpis">
   <div class="user-kpi-card purple">
     <div class="user-kpi-icon"><i class="bi bi-people"></i></div>
@@ -36,9 +43,9 @@
   <div class="user-kpi-card green">
     <div class="user-kpi-icon"><i class="bi bi-person-check"></i></div>
     <div>
-      <small>Funcionários</small>
+      <small>Trabalhadores</small>
       <h3>{{ total_funcionarios or 0 }}</h3>
-      <p>Operação diária</p>
+      <p>Operação do estoque</p>
     </div>
   </div>
 
@@ -76,7 +83,7 @@
         <label>Perfil</label>
         <select class="form-control" name="perfil">
           <option value="admin">Admin</option>
-          <option value="funcionario">Funcionário</option>
+          <option value="funcionario">Trabalhador</option>
           <option value="visualizador">Visualizador</option>
         </select>
       </div>

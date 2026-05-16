@@ -2063,3 +2063,51 @@
     white-space:normal;
   }
 }
+
+
+/* ===== Hierarquia de usuários ===== */
+.hierarchy-panel{
+  display:grid;
+  grid-template-columns:repeat(3,minmax(0,1fr));
+  gap:16px;
+  margin-bottom:24px;
+}
+
+.hierarchy-card{
+  background:var(--surface);
+  border:1px solid var(--border);
+  border-radius:16px;
+  padding:18px;
+  box-shadow:var(--shadow);
+}
+
+.hierarchy-card strong{
+  display:block;
+  color:var(--text);
+  font-size:17px;
+  font-weight:950;
+  margin-bottom:6px;
+}
+
+.hierarchy-card p{
+  margin:0;
+  color:var(--muted);
+}
+
+.hierarchy-card.admin{border-left:4px solid #2563eb}
+.hierarchy-card.worker{border-left:4px solid #16a34a}
+.hierarchy-card.viewer{border-left:4px solid #9333ea}
+
+.readonly-layout{
+  grid-template-columns:1fr !important;
+}
+
+.readonly-layout .mov-right{
+  width:100%;
+}
+
+@media(max-width:900px){
+  .hierarchy-panel{
+    grid-template-columns:1fr;
+  }
+}

@@ -14,7 +14,7 @@
 </form>
 
 <div class="row g-4">
-  <div class="col-xl-3 col-lg-4">
+  {% if can_write %}<div class="col-xl-3 col-lg-4">
     <form method="post" class="panel stock-form">
       <h4>Novo produto</h4>
 
@@ -28,9 +28,9 @@
 
       <button class="btn btn-primary w-100">Cadastrar</button>
     </form>
-  </div>
+  </div>{% endif %}
 
-  <div class="col-xl-9 col-lg-8">
+  <div class="{% if can_write %}col-xl-9 col-lg-8{% else %}col-12{% endif %}">
     <div class="products-grid">
 
       {% for p in produtos %}
@@ -74,12 +74,14 @@
           </div>
 
           <div class="product-actions">
+            {% if can_write %}
             <a class="btn btn-sm btn-success" href="/movimentacoes?produto_id={{p.id}}">
               Movimentar
             </a>
             <a class="btn btn-sm btn-warning" href="/produtos/editar/{{p.id}}">
               Editar
             </a>
+            {% endif %}
             {% if usuario_perfil == 'admin' %}
             <a class="btn btn-sm btn-danger" href="/produtos/excluir/{{p.id}}">
               Excluir
