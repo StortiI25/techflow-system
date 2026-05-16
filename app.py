@@ -436,49 +436,126 @@ def excluir_produto(id):
 @login_required
 def movimentacoes():
     conn = get_db()
+
     if request.method == "POST":
-        produto_id = int(request.form["produto_id"])
-        cliente_id = request.form.get("cliente_id") or None
+        produto_id = request.form["produto_id"]
         tipo = request.form["tipo"]
         motivo = request.form["motivo"]
         quantidade = int(request.form["quantidade"])
-        obs = request.form.get("observacao","")
-        produto = conn.execute("SELECT * FROM produtos WHERE id=?", (produto_id,)).fetchone()
-        if tipo == "saida" and quantidade > produto["estoque"]:
+        cliente_id = request.form.get("cliente_id") or None
+        observacao = request.form.get("observacao", "")
+
+        produto = conn.execute(
+            "SELECT * FROM produtos WHERE id=?",
+            (produto_id,)
+        ).fetchone()
+
+        if not produto:
+            flash("Produto não encontrado.", "danger")
             conn.close()
-            flash(f"Estoque insuficiente. Disponível: {produto['estoque']} unidades.", "danger")
-            return redirect(url_for("movimentacoes", produto_id=produto_id))
-        valor = produto["preco_venda"] if tipo == "saida" else produto["preco_custo"]
-        total = valor * quantidade
+            return redirect(url_for("movimentacoes"))
+
+        estoque_atual = produto["estoque"]
+
+        if tipo == "saida" and quantidade > estoque_atual:
+            flash("Estoque insuficiente para realizar a saída.", "danger")
+            conn.close()
+            return redirect(url_for("movimentacoes"))
+
+        novo_estoque = estoque_atual + quantidade if tipo == "entrada" else estoque_atual - quantidade
+
+        conn.execute(
+            "UPDATE produtos SET estoque=? WHERE id=?",
+            (novo_estoque, produto_id)
+        )
+
+        valor_total = quantidade * float(produto["preco_venda"])
+
         conn.execute("""
-            INSERT INTO movimentacoes(produto_id,cliente_id,usuario_id,tipo,motivo,quantidade,valor_unitario,valor_total,data_movimentacao,observacao)
-            VALUES(?,?,?,?,?,?,?,?,?,?)
-        """, (produto_id, cliente_id, session["usuario_id"], tipo, motivo, quantidade, valor, total, today_iso(), obs))
-        if tipo == "entrada":
-            conn.execute("UPDATE produtos SET estoque=estoque+? WHERE id=?", (quantidade, produto_id))
-        else:
-            conn.execute("UPDATE produtos SET estoque=estoque-? WHERE id=?", (quantidade, produto_id))
+            INSERT INTO movimentacoes(
+                produto_id,tipo,motivo,quantidade,cliente_id,
+                usuario,data_movimentacao,observacao,valor_total
+            )
+            VALUES(?,?,?,?,?,?,?,?,?)
+        """, (
+            produto_id,
+            tipo,
+            motivo,
+            quantidade,
+            cliente_id,
+            session.get("usuario_nome","Administrador"),
+            today_iso(),
+            observacao,
+            valor_total
+        ))
+
         conn.commit()
+
+        log_action(
+            f"Movimentação {tipo} | Produto: {produto['nome']} | Quantidade: {quantidade}"
+        )
+
         conn.close()
-        log_action(f"Movimentação registrada: {tipo} / {motivo} / {quantidade} un.", produto_id, produto["nome"])
+
+        flash("Movimentação registrada com sucesso!", "success")
         return redirect(url_for("movimentacoes"))
+
     produto_id = request.args.get("produto_id")
-    produtos = conn.execute("SELECT * FROM produtos ORDER BY nome").fetchall()
-    clientes = conn.execute("SELECT * FROM clientes ORDER BY nome").fetchall()
-    rows = conn.execute("""
-        SELECT m.*, p.nome produto, c.nome cliente, u.nome usuario
-        FROM movimentacoes m JOIN produtos p ON p.id=m.produto_id
-        LEFT JOIN clientes c ON c.id=m.cliente_id
-        LEFT JOIN usuarios u ON u.id=m.usuario_id
-        ORDER BY m.id DESC LIMIT 80
+
+    produtos = conn.execute("""
+        SELECT * FROM produtos
+        ORDER BY nome
     """).fetchall()
+
+    clientes = conn.execute("""
+        SELECT * FROM clientes
+        ORDER BY nome
+    """).fetchall()
+
+    rows = conn.execute("""
+        SELECT
+            m.*,
+            p.nome AS produto,
+            c.nome AS cliente
+        FROM movimentacoes m
+        LEFT JOIN produtos p ON p.id = m.produto_id
+        LEFT JOIN clientes c ON c.id = m.cliente_id
+        ORDER BY m.id DESC
+        LIMIT 50
+    """).fetchall()
+
+    mov_hoje = conn.execute(
+        "SELECT COUNT(*) total FROM movimentacoes WHERE data_movimentacao=?",
+        (today_iso(),)
+    ).fetchone()["total"]
+
+    entradas_hoje = conn.execute(
+        "SELECT COALESCE(SUM(quantidade),0) total FROM movimentacoes WHERE tipo='entrada' AND data_movimentacao=?",
+        (today_iso(),)
+    ).fetchone()["total"]
+
+    saidas_hoje = conn.execute(
+        "SELECT COALESCE(SUM(quantidade),0) total FROM movimentacoes WHERE tipo='saida' AND data_movimentacao=?",
+        (today_iso(),)
+    ).fetchone()["total"]
+
+    estoque_total = conn.execute(
+        "SELECT COALESCE(SUM(estoque),0) total FROM produtos"
+    ).fetchone()["total"]
+
     conn.close()
-    
-    mov_hoje = conn.execute("SELECT COUNT(*) total FROM movimentacoes WHERE data_movimentacao=?", (today_iso(),)).fetchone()["total"]
-    entradas_hoje = conn.execute("SELECT COALESCE(SUM(quantidade),0) total FROM movimentacoes WHERE tipo='entrada' AND data_movimentacao=?", (today_iso(),)).fetchone()["total"]
-    saidas_hoje = conn.execute("SELECT COALESCE(SUM(quantidade),0) total FROM movimentacoes WHERE tipo='saida' AND data_movimentacao=?", (today_iso(),)).fetchone()["total"]
-    estoque_total = conn.execute("SELECT COALESCE(SUM(estoque),0) total FROM produtos").fetchone()["total"]
-    return render_template("movimentacoes.html", produtos=produtos, clientes=clientes, movimentos=rows, produto_id=produto_id, mov_hoje=mov_hoje, entradas_hoje=entradas_hoje, saidas_hoje=saidas_hoje, estoque_total=estoque_total)
+
+    return render_template(
+        "movimentacoes.html",
+        produtos=produtos,
+        clientes=clientes,
+        movimentos=rows,
+        produto_id=produto_id,
+        mov_hoje=mov_hoje,
+        entradas_hoje=entradas_hoje,
+        saidas_hoje=saidas_hoje,
+        estoque_total=estoque_total
+    )
 
 
 @app.route("/relatorios")
