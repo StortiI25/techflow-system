@@ -110,7 +110,7 @@
         <tr>
           <td>
             <div class="client-avatar color-{{ loop.index }}">
-              {{ c.nome.split()[0][0] }}{{ c.nome.split()[1][0] if c.nome.split()|length > 1 else '' }}
+              {{ c.nome[:2]|upper }}
             </div>
           </td>
           <td>
