@@ -562,15 +562,49 @@ def movimentacoes():
 @login_required
 def relatorios():
     conn = get_db()
+
     vendidos = conn.execute("""
         SELECT p.nome, SUM(m.quantidade) qtd, SUM(m.valor_total) total
-        FROM movimentacoes m JOIN produtos p ON p.id=m.produto_id
+        FROM movimentacoes m
+        JOIN produtos p ON p.id=m.produto_id
         WHERE m.tipo='saida' AND m.motivo='Venda'
-        GROUP BY p.id ORDER BY qtd DESC
+        GROUP BY p.id
+        ORDER BY qtd DESC
     """).fetchall()
-    criticos = conn.execute("SELECT * FROM produtos WHERE estoque <= estoque_minimo ORDER BY estoque ASC").fetchall()
+
+    criticos = conn.execute("""
+        SELECT * FROM produtos
+        WHERE estoque <= estoque_minimo
+        ORDER BY estoque ASC
+    """).fetchall()
+
+    total_produtos = conn.execute(
+        "SELECT COUNT(*) total FROM produtos"
+    ).fetchone()["total"]
+
+    total_movimentacoes = conn.execute(
+        "SELECT COUNT(*) total FROM movimentacoes"
+    ).fetchone()["total"]
+
+    valor_estoque = conn.execute(
+        "SELECT COALESCE(SUM(estoque * preco_custo),0) total FROM produtos"
+    ).fetchone()["total"]
+
+    total_vendas = conn.execute(
+        "SELECT COALESCE(SUM(valor_total),0) total FROM movimentacoes WHERE tipo='saida' AND motivo='Venda'"
+    ).fetchone()["total"]
+
     conn.close()
-    return render_template("relatorios.html", vendidos=vendidos, criticos=criticos)
+
+    return render_template(
+        "relatorios.html",
+        vendidos=vendidos,
+        criticos=criticos,
+        total_produtos=total_produtos,
+        total_movimentacoes=total_movimentacoes,
+        valor_estoque=valor_estoque,
+        total_vendas=total_vendas
+    )
 
 @app.route("/relatorios/produtos.csv")
 @login_required
@@ -633,14 +667,53 @@ def historico():
 @admin_required
 def usuarios():
     conn = get_db()
+
     if request.method == "POST":
-        conn.execute("INSERT INTO usuarios(nome,email,senha,perfil,criado_em) VALUES(?,?,?,?,?)",
-                     (request.form["nome"], request.form["email"].lower(), generate_password_hash(request.form["senha"]), request.form["perfil"], now_br()))
+        conn.execute(
+            "INSERT INTO usuarios(nome,email,senha,perfil,criado_em) VALUES(?,?,?,?,?)",
+            (
+                request.form["nome"],
+                request.form["email"].lower(),
+                generate_password_hash(request.form["senha"]),
+                request.form["perfil"],
+                now_br()
+            )
+        )
         conn.commit()
         log_action(f"Usuário cadastrado: {request.form['nome']}")
-    users = conn.execute("SELECT id,nome,email,perfil,criado_em FROM usuarios ORDER BY id DESC").fetchall()
+
+    users = conn.execute("""
+        SELECT id,nome,email,perfil,criado_em
+        FROM usuarios
+        ORDER BY id DESC
+    """).fetchall()
+
+    total_usuarios = conn.execute(
+        "SELECT COUNT(*) total FROM usuarios"
+    ).fetchone()["total"]
+
+    total_admins = conn.execute(
+        "SELECT COUNT(*) total FROM usuarios WHERE perfil='admin'"
+    ).fetchone()["total"]
+
+    total_funcionarios = conn.execute(
+        "SELECT COUNT(*) total FROM usuarios WHERE perfil='funcionario'"
+    ).fetchone()["total"]
+
+    total_visualizadores = conn.execute(
+        "SELECT COUNT(*) total FROM usuarios WHERE perfil='visualizador'"
+    ).fetchone()["total"]
+
     conn.close()
-    return render_template("usuarios.html", usuarios=users)
+
+    return render_template(
+        "usuarios.html",
+        usuarios=users,
+        total_usuarios=total_usuarios,
+        total_admins=total_admins,
+        total_funcionarios=total_funcionarios,
+        total_visualizadores=total_visualizadores
+    )
 
 @app.route("/perfil", methods=["GET","POST"])
 @login_required

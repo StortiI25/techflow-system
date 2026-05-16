@@ -1,1 +1,160 @@
-{% extends "base.html" %}{% block content %}<div class="page-title"><div><h1>Relatórios</h1><p>Exportação e análise.</p></div><div class="d-flex gap-2 flex-wrap"><a class="btn btn-success" href="/relatorios/produtos.csv">Produtos CSV</a><a class="btn btn-success" href="/relatorios/movimentacoes.csv">Movimentações CSV</a><button class="btn btn-primary" onclick="window.print()">PDF</button></div></div><div class="row g-4"><div class="col-lg-7"><div class="panel table-responsive"><h4>Produtos mais vendidos</h4><table class="table table-tech"><thead><tr><th>Produto</th><th>Qtd</th><th>Total</th></tr></thead><tbody>{% for v in vendidos %}<tr><td>{{v.nome}}</td><td>{{v.qtd}}</td><td>R$ {{ "%.2f"|format(v.total) }}</td></tr>{% endfor %}</tbody></table></div></div><div class="col-lg-5"><div class="panel table-responsive"><h4>Estoque crítico</h4><table class="table table-tech"><thead><tr><th>Produto</th><th>Atual</th><th>Mínimo</th></tr></thead><tbody>{% for p in criticos %}<tr><td>{{p.nome}}</td><td><span class="badge bg-danger">{{p.estoque}}</span></td><td>{{p.estoque_minimo}}</td></tr>{% endfor %}</tbody></table></div></div></div>{% endblock %}
+
+{% extends "base.html" %}
+{% block content %}
+
+<div class="page-title reports-title">
+  <div>
+    <h1>Relatórios</h1>
+    <p>Indicadores, exportação e análise para tomada de decisão.</p>
+  </div>
+
+  <div class="reports-actions">
+    <a class="btn btn-success" href="/relatorios/produtos.csv">
+      <i class="bi bi-file-earmark-spreadsheet"></i>
+      Produtos CSV
+    </a>
+    <a class="btn btn-success" href="/relatorios/movimentacoes.csv">
+      <i class="bi bi-file-earmark-spreadsheet"></i>
+      Movimentações CSV
+    </a>
+    <button class="btn btn-primary" onclick="window.print()">
+      <i class="bi bi-file-earmark-pdf"></i>
+      PDF
+    </button>
+  </div>
+</div>
+
+<div class="report-kpis">
+  <div class="report-kpi-card purple">
+    <div class="report-kpi-icon"><i class="bi bi-box-seam"></i></div>
+    <div>
+      <small>Total de produtos</small>
+      <h3>{{ total_produtos or 0 }}</h3>
+      <p>Itens cadastrados</p>
+    </div>
+  </div>
+
+  <div class="report-kpi-card blue">
+    <div class="report-kpi-icon"><i class="bi bi-arrow-left-right"></i></div>
+    <div>
+      <small>Movimentações</small>
+      <h3>{{ total_movimentacoes or 0 }}</h3>
+      <p>Registros no sistema</p>
+    </div>
+  </div>
+
+  <div class="report-kpi-card green">
+    <div class="report-kpi-icon"><i class="bi bi-cash-stack"></i></div>
+    <div>
+      <small>Valor do estoque</small>
+      <h3>R$ {{ "%.2f"|format(valor_estoque or 0) }}</h3>
+      <p>Custo total estimado</p>
+    </div>
+  </div>
+
+  <div class="report-kpi-card red">
+    <div class="report-kpi-icon"><i class="bi bi-exclamation-triangle"></i></div>
+    <div>
+      <small>Estoque crítico</small>
+      <h3>{{ criticos|length }}</h3>
+      <p>Produtos abaixo do mínimo</p>
+    </div>
+  </div>
+</div>
+
+<div class="reports-grid">
+  <div class="report-card large">
+    <div class="report-card-header">
+      <div>
+        <h4>Produtos mais vendidos</h4>
+        <p>Curva ABC simplificada baseada nas saídas do tipo venda.</p>
+      </div>
+      <span class="report-badge">Ranking</span>
+    </div>
+
+    <div class="table-responsive">
+      <table class="table report-table">
+        <thead>
+          <tr>
+            <th>#</th>
+            <th>Produto</th>
+            <th>Qtd vendida</th>
+            <th>Valor total</th>
+            <th>Participação</th>
+          </tr>
+        </thead>
+        <tbody>
+        {% for v in vendidos %}
+          <tr>
+            <td>
+              <span class="rank-badge">{{ loop.index }}</span>
+            </td>
+            <td>
+              <strong>{{ v.nome }}</strong>
+            </td>
+            <td>{{ v.qtd }}</td>
+            <td>R$ {{ "%.2f"|format(v.total) }}</td>
+            <td>
+              <div class="progress-line">
+                <span style="width: {{ 90 - (loop.index0 * 10) if (90 - (loop.index0 * 10)) > 20 else 20 }}%"></span>
+              </div>
+            </td>
+          </tr>
+        {% else %}
+          <tr><td colspan="5">Nenhuma venda registrada.</td></tr>
+        {% endfor %}
+        </tbody>
+      </table>
+    </div>
+  </div>
+
+  <div class="report-card">
+    <div class="report-card-header">
+      <div>
+        <h4>Estoque crítico</h4>
+        <p>Produtos que exigem atenção.</p>
+      </div>
+      <span class="report-badge danger">Alerta</span>
+    </div>
+
+    <div class="critical-list">
+      {% for p in criticos %}
+      <div class="critical-report-item">
+        <div>
+          <strong>{{ p.nome }}</strong>
+          <small>{{ p.categoria }}</small>
+        </div>
+        <div class="critical-values">
+          <span>Atual: {{ p.estoque }}</span>
+          <small>Mín: {{ p.estoque_minimo }}</small>
+        </div>
+      </div>
+      {% else %}
+      <div class="empty-state">
+        <i class="bi bi-check-circle"></i>
+        <strong>Nenhum item crítico</strong>
+        <p>Seu estoque está saudável.</p>
+      </div>
+      {% endfor %}
+    </div>
+  </div>
+</div>
+
+<div class="reports-bottom">
+  <div class="report-card">
+    <h4>Resumo financeiro</h4>
+    <p>Valor total das vendas registradas.</p>
+    <div class="money-highlight">R$ {{ "%.2f"|format(total_vendas or 0) }}</div>
+  </div>
+
+  <div class="report-card">
+    <h4>Ações rápidas</h4>
+    <p>Use os botões acima para exportar relatórios em CSV ou gerar PDF pela impressão do navegador.</p>
+    <div class="quick-actions">
+      <a class="btn btn-outline-primary" href="/produtos">Ver estoque</a>
+      <a class="btn btn-outline-primary" href="/movimentacoes">Ver movimentações</a>
+    </div>
+  </div>
+</div>
+
+{% endblock %}

@@ -1,1 +1,178 @@
-{% extends "base.html" %}{% block content %}<div class="page-title"><div><h1>Usuários</h1><p>Permissões do sistema.</p></div></div><div class="row g-4"><div class="col-lg-4"><form method="post" class="panel"><h4>Novo usuário</h4><input class="form-control mb-3" name="nome" placeholder="Nome" required><input class="form-control mb-3" name="email" type="email" placeholder="Email" required><input class="form-control mb-3" name="senha" type="password" placeholder="Senha" required><select class="form-control mb-3" name="perfil"><option value="admin">Admin</option><option value="funcionario">Funcionário</option><option value="visualizador">Visualizador</option></select><button class="btn btn-primary w-100">Cadastrar</button></form></div><div class="col-lg-8"><div class="panel table-responsive"><table class="table table-tech"><thead><tr><th>Nome</th><th>Email</th><th>Perfil</th><th>Criado</th></tr></thead><tbody>{% for u in usuarios %}<tr><td>{{u.nome}}</td><td>{{u.email}}</td><td><span class="badge bg-primary">{{u.perfil}}</span></td><td>{{u.criado_em}}</td></tr>{% endfor %}</tbody></table></div></div></div>{% endblock %}
+
+{% extends "base.html" %}
+{% block content %}
+
+<div class="page-title users-title">
+  <div>
+    <h1>Usuários</h1>
+    <p>Gestão de acessos, permissões e perfis do sistema.</p>
+  </div>
+
+  <button class="btn btn-primary" type="button" data-bs-toggle="collapse" data-bs-target="#novoUsuario">
+    <i class="bi bi-plus-lg"></i>
+    Novo usuário
+  </button>
+</div>
+
+<div class="user-kpis">
+  <div class="user-kpi-card purple">
+    <div class="user-kpi-icon"><i class="bi bi-people"></i></div>
+    <div>
+      <small>Total de usuários</small>
+      <h3>{{ total_usuarios or usuarios|length }}</h3>
+      <p>Contas cadastradas</p>
+    </div>
+  </div>
+
+  <div class="user-kpi-card blue">
+    <div class="user-kpi-icon"><i class="bi bi-shield-lock"></i></div>
+    <div>
+      <small>Administradores</small>
+      <h3>{{ total_admins or 0 }}</h3>
+      <p>Acesso total</p>
+    </div>
+  </div>
+
+  <div class="user-kpi-card green">
+    <div class="user-kpi-icon"><i class="bi bi-person-check"></i></div>
+    <div>
+      <small>Funcionários</small>
+      <h3>{{ total_funcionarios or 0 }}</h3>
+      <p>Operação diária</p>
+    </div>
+  </div>
+
+  <div class="user-kpi-card orange">
+    <div class="user-kpi-icon"><i class="bi bi-eye"></i></div>
+    <div>
+      <small>Visualizadores</small>
+      <h3>{{ total_visualizadores or 0 }}</h3>
+      <p>Apenas consulta</p>
+    </div>
+  </div>
+</div>
+
+<div class="collapse mb-4" id="novoUsuario">
+  <form method="post" class="panel user-form-modern">
+    <h4>Novo usuário</h4>
+
+    <div class="row g-3">
+      <div class="col-md-6">
+        <label>Nome</label>
+        <input class="form-control" name="nome" placeholder="Nome completo" required>
+      </div>
+
+      <div class="col-md-6">
+        <label>E-mail</label>
+        <input class="form-control" name="email" type="email" placeholder="email@estoqueflow.com" required>
+      </div>
+
+      <div class="col-md-6">
+        <label>Senha</label>
+        <input class="form-control" name="senha" type="password" placeholder="Senha inicial" required>
+      </div>
+
+      <div class="col-md-6">
+        <label>Perfil</label>
+        <select class="form-control" name="perfil">
+          <option value="admin">Admin</option>
+          <option value="funcionario">Funcionário</option>
+          <option value="visualizador">Visualizador</option>
+        </select>
+      </div>
+    </div>
+
+    <button class="btn btn-primary mt-3">
+      <i class="bi bi-person-plus"></i>
+      Cadastrar usuário
+    </button>
+  </form>
+</div>
+
+<div class="users-table-card">
+  <div class="users-table-header">
+    <div>
+      <h4>Usuários cadastrados</h4>
+      <p>Controle dos perfis de acesso.</p>
+    </div>
+
+    <div class="users-search">
+      <i class="bi bi-search"></i>
+      <input type="text" placeholder="Buscar usuário...">
+    </div>
+  </div>
+
+  <div class="table-responsive">
+    <table class="table users-table">
+      <thead>
+        <tr>
+          <th>Usuário</th>
+          <th>Email</th>
+          <th>Perfil</th>
+          <th>Status</th>
+          <th>Criado</th>
+          <th>Ações</th>
+        </tr>
+      </thead>
+
+      <tbody>
+      {% for u in usuarios %}
+        <tr>
+          <td>
+            <div class="user-cell">
+              <div class="user-avatar-table color-{{ loop.index }}">
+                {{ u.nome[:2]|upper }}
+              </div>
+              <div>
+                <strong>{{ u.nome }}</strong>
+                <small>ID #{{ u.id }}</small>
+              </div>
+            </div>
+          </td>
+
+          <td>{{ u.email }}</td>
+
+          <td>
+            <span class="role-pill {{ u.perfil }}">
+              {% if u.perfil == 'admin' %}
+                <i class="bi bi-shield-lock"></i>
+              {% elif u.perfil == 'funcionario' %}
+                <i class="bi bi-person-check"></i>
+              {% else %}
+                <i class="bi bi-eye"></i>
+              {% endif %}
+              {{ u.perfil }}
+            </span>
+          </td>
+
+          <td>
+            <span class="status-active">
+              <i class="bi bi-circle-fill"></i>
+              Ativo
+            </span>
+          </td>
+
+          <td>{{ u.criado_em }}</td>
+
+          <td>
+            <div class="user-actions">
+              <button type="button" title="Editar"><i class="bi bi-pencil"></i></button>
+              <button type="button" title="Permissões"><i class="bi bi-key"></i></button>
+            </div>
+          </td>
+        </tr>
+      {% endfor %}
+      </tbody>
+    </table>
+  </div>
+
+  <div class="users-footer">
+    <span>Mostrando {{ usuarios|length }} usuários cadastrados</span>
+    <span class="read-only-note">
+      <i class="bi bi-shield-check"></i>
+      Controle administrativo
+    </span>
+  </div>
+</div>
+
+{% endblock %}
