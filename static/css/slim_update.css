@@ -1,0 +1,106 @@
+
+/* DESIGN SLIM */
+
+.sidebar{
+    width:240px;
+    padding:18px 14px;
+}
+
+.main{
+    margin-left:240px;
+}
+
+.nav-menu a{
+    padding:11px 12px;
+    font-size:15px;
+    border-radius:10px;
+}
+
+.nav-menu i{
+    font-size:18px;
+}
+
+.panel{
+    padding:18px;
+    border-radius:16px;
+}
+
+.table-tech th,
+.table-tech td{
+    padding:12px 14px;
+    font-size:14px;
+}
+
+.kpi-card{
+    padding:18px;
+}
+
+.page-title h1{
+    font-size:52px;
+}
+
+.user-dropdown{
+    background:transparent;
+    border:0;
+    display:flex;
+    align-items:center;
+    gap:12px;
+    color:var(--text);
+}
+
+.user-info{
+    display:flex;
+    flex-direction:column;
+    text-align:left;
+    line-height:1.1;
+}
+
+.custom-dropdown{
+    background:var(--surface);
+    border:1px solid var(--border);
+    border-radius:14px;
+    padding:10px;
+}
+
+.custom-dropdown .dropdown-item{
+    border-radius:10px;
+    padding:10px 12px;
+    color:var(--text);
+}
+
+.custom-dropdown .dropdown-item:hover{
+    background:rgba(109,92,255,.15);
+}
+
+.table-responsive{
+    overflow-x:auto;
+    scrollbar-width:thin;
+}
+
+/* MOBILE */
+
+@media(max-width:768px){
+
+    .sidebar{
+        width:220px;
+    }
+
+    .main{
+        margin-left:0;
+    }
+
+    .page-title h1{
+        font-size:34px;
+    }
+
+    .panel{
+        padding:14px;
+    }
+
+    .table-tech th,
+    .table-tech td{
+        font-size:13px;
+        padding:10px;
+    }
+
+}

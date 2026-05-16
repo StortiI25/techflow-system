@@ -1,0 +1,51 @@
+
+<!-- SUBSTITUIR A ÁREA topbar-actions NO base.html -->
+<div class="topbar-actions">
+
+    <button class="theme-button" id="themeToggle" type="button"></button>
+
+    <div class="dropdown">
+        <button class="user-dropdown" data-bs-toggle="dropdown">
+
+            <div class="avatar">
+                {{ usuario_nome[0]|upper }}
+            </div>
+
+            <div class="user-info">
+                <strong>{{ usuario_nome }}</strong>
+                <small>{{ usuario_perfil }}</small>
+            </div>
+
+            <i class="bi bi-chevron-down"></i>
+        </button>
+
+        <ul class="dropdown-menu dropdown-menu-end custom-dropdown">
+
+            <li>
+                <a class="dropdown-item" href="/perfil">
+                    <i class="bi bi-person-circle"></i>
+                    Meu Perfil
+                </a>
+            </li>
+
+            <li>
+                <a class="dropdown-item" href="/perfil">
+                    <i class="bi bi-gear"></i>
+                    Configurações
+                </a>
+            </li>
+
+            <li><hr class="dropdown-divider"></li>
+
+            <li>
+                <a class="dropdown-item text-danger" href="/logout">
+                    <i class="bi bi-box-arrow-right"></i>
+                    Sair
+                </a>
+            </li>
+
+        </ul>
+    </div>
+</div>
+
+<!-- REMOVER O LINK /perfil DA SIDEBAR -->
