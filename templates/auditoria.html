@@ -2,92 +2,96 @@
 {% extends "base.html" %}
 {% block content %}
 
-<div class="page-title audit-title">
+<div class="page-title audit-page-title">
   <div>
     <h1>Auditoria</h1>
-    <p>Histórico imutável das ações realizadas no sistema.</p>
+    <p>Histórico inalterável das ações do sistema, com filtros simples e leitura rápida.</p>
   </div>
 
-  <div class="audit-actions">
-    <span class="audit-readonly">
-      <i class="bi bi-shield-lock"></i>
+  <div class="audit-title-actions">
+    <span class="audit-lock-badge">
+      <i class="bi bi-shield-lock-fill"></i>
       Read-only
     </span>
-
-    <button class="btn btn-primary">
+    <button class="btn btn-primary" onclick="window.print()">
       <i class="bi bi-download"></i>
-      Exportar log
+      Exportar
     </button>
   </div>
 </div>
 
-<div class="audit-kpis">
-  <div class="audit-kpi-card purple">
-    <div class="audit-kpi-icon"><i class="bi bi-clock-history"></i></div>
+<div class="audit-cards">
+  <div class="audit-card purple">
+    <div class="audit-card-icon">
+      <i class="bi bi-clock-history"></i>
+    </div>
     <div>
-      <small>Total de logs</small>
+      <small>Total de registros</small>
       <h3>{{ logs|length }}</h3>
-      <p>Eventos registrados</p>
+      <p>Eventos encontrados</p>
     </div>
   </div>
 
-  <div class="audit-kpi-card blue">
-    <div class="audit-kpi-icon"><i class="bi bi-people"></i></div>
+  <div class="audit-card green">
+    <div class="audit-card-icon">
+      <i class="bi bi-check-circle"></i>
+    </div>
     <div>
-      <small>Usuários ativos</small>
-      <h3>3</h3>
-      <p>Com ações registradas</p>
+      <small>Status</small>
+      <h3>OK</h3>
+      <p>Sem inconsistências</p>
     </div>
   </div>
 
-  <div class="audit-kpi-card green">
-    <div class="audit-kpi-icon"><i class="bi bi-box-seam"></i></div>
+  <div class="audit-card blue">
+    <div class="audit-card-icon">
+      <i class="bi bi-person-badge"></i>
+    </div>
     <div>
-      <small>Movimentações</small>
-      <h3>128</h3>
-      <p>Eventos de estoque</p>
+      <small>Principal usuário</small>
+      <h3>Admin</h3>
+      <p>Mais ações no sistema</p>
     </div>
   </div>
 
-  <div class="audit-kpi-card red">
-    <div class="audit-kpi-icon"><i class="bi bi-exclamation-triangle"></i></div>
+  <div class="audit-card orange">
+    <div class="audit-card-icon">
+      <i class="bi bi-database-check"></i>
+    </div>
     <div>
-      <small>Eventos críticos</small>
-      <h3>0</h3>
-      <p>Nenhuma inconsistência</p>
+      <small>Integridade</small>
+      <h3>100%</h3>
+      <p>Logs somente leitura</p>
     </div>
   </div>
 </div>
 
-<div class="audit-panel">
-  <div class="audit-filter-header">
+<div class="audit-filter-panel">
+  <div class="audit-filter-top">
     <div>
-      <h4>Filtros de auditoria</h4>
-      <p>Busque ações por usuário, produto ou data.</p>
+      <h4>Filtros rápidos</h4>
+      <p>Pesquise por usuário, produto ou data.</p>
     </div>
-
-    <div class="audit-filter-actions">
-      <button class="btn btn-outline-primary">
-        <i class="bi bi-arrow-clockwise"></i>
-        Atualizar
-      </button>
-    </div>
+    <a class="btn btn-outline-primary" href="/historico">
+      <i class="bi bi-arrow-clockwise"></i>
+      Limpar filtros
+    </a>
   </div>
 
-  <form class="audit-filters">
-    <div class="audit-input">
+  <form class="audit-filter-grid" method="get">
+    <div class="audit-input-box">
       <i class="bi bi-person"></i>
-      <input placeholder="Buscar por usuário">
+      <input name="usuario" value="{{ usuario }}" placeholder="Usuário">
     </div>
 
-    <div class="audit-input">
-      <i class="bi bi-box"></i>
-      <input placeholder="Buscar por produto">
+    <div class="audit-input-box">
+      <i class="bi bi-box-seam"></i>
+      <input name="produto" value="{{ produto }}" placeholder="Produto">
     </div>
 
-    <div class="audit-input">
+    <div class="audit-input-box">
       <i class="bi bi-calendar3"></i>
-      <input type="date">
+      <input name="data" value="{{ data }}" placeholder="Data. Ex: 15/05">
     </div>
 
     <button class="btn btn-primary">
@@ -97,85 +101,83 @@
   </form>
 </div>
 
-<div class="audit-table-card">
-  <div class="audit-table-header">
+<div class="audit-main-card">
+  <div class="audit-main-header">
     <div>
-      <h4>Histórico do sistema</h4>
-      <p>Todos os registros são somente leitura.</p>
+      <h4>Linha do tempo da auditoria</h4>
+      <p>Cada registro mostra quem fez, o que fez e quando aconteceu.</p>
     </div>
 
-    <span class="audit-secure">
-      <i class="bi bi-shield-check"></i>
-      Integridade protegida
+    <span class="audit-safe-badge">
+      <i class="bi bi-patch-check-fill"></i>
+      Protegido
     </span>
   </div>
 
-  <div class="table-responsive">
-    <table class="table audit-table">
-      <thead>
-        <tr>
-          <th>Usuário</th>
-          <th>Ação</th>
-          <th>Produto</th>
-          <th>Data/Hora</th>
-          <th>Status</th>
-        </tr>
-      </thead>
+  <div class="audit-timeline">
+    {% for l in logs %}
+    <div class="audit-timeline-item">
+      <div class="audit-dot">
+        {% if 'Login' in l.acao %}
+          <i class="bi bi-box-arrow-in-right"></i>
+        {% elif 'Produto' in l.acao or l.produto_nome %}
+          <i class="bi bi-box-seam"></i>
+        {% elif 'Cliente' in l.acao %}
+          <i class="bi bi-buildings"></i>
+        {% elif 'Movimentação' in l.acao %}
+          <i class="bi bi-arrow-left-right"></i>
+        {% else %}
+          <i class="bi bi-activity"></i>
+        {% endif %}
+      </div>
 
-      <tbody>
-      {% for l in logs %}
-        <tr>
-          <td>
-            <div class="audit-user">
-              <div class="audit-avatar">
-                {{ l.usuario[:1]|upper }}
-              </div>
-              <div>
-                <strong>{{ l.usuario }}</strong>
-                <small>Administrador</small>
-              </div>
-            </div>
-          </td>
+      <div class="audit-event">
+        <div class="audit-event-top">
+          <div>
+            <strong>{{ l.acao }}</strong>
+            <p>
+              <i class="bi bi-person-circle"></i>
+              {{ l.usuario_nome or l.usuario or 'Sistema' }}
+              {% if l.produto_nome or l.produto %}
+                <span>•</span>
+                <i class="bi bi-box"></i>
+                {{ l.produto_nome or l.produto }}
+              {% endif %}
+            </p>
+          </div>
 
-          <td>
-            <div class="audit-action-cell">
-              <strong>{{ l.acao }}</strong>
-              <small>Registro automático do sistema</small>
-            </div>
-          </td>
+          <div class="audit-date">
+            <i class="bi bi-calendar-check"></i>
+            {{ l.data_hora }}
+          </div>
+        </div>
 
-          <td>
-            <span class="audit-product">
-              {{ l.produto or '-' }}
-            </span>
-          </td>
-
-          <td>
-            <strong>{{ l.data_hora }}</strong>
-            <small>Horário do servidor</small>
-          </td>
-
-          <td>
-            <span class="audit-status">
-              <i class="bi bi-check-circle-fill"></i>
-              Registrado
-            </span>
-          </td>
-        </tr>
-      {% endfor %}
-      </tbody>
-    </table>
+        <div class="audit-event-bottom">
+          <span class="audit-status-pill">
+            <i class="bi bi-check-circle-fill"></i>
+            Registrado
+          </span>
+          <span class="audit-read-pill">
+            Somente leitura
+          </span>
+        </div>
+      </div>
+    </div>
+    {% else %}
+    <div class="audit-empty">
+      <i class="bi bi-inbox"></i>
+      <h4>Nenhum registro encontrado</h4>
+      <p>Tente limpar os filtros ou realizar uma ação no sistema.</p>
+    </div>
+    {% endfor %}
   </div>
 
-  <div class="audit-footer">
+  <div class="audit-bottom">
     <span>Mostrando {{ logs|length }} registros</span>
-
-    <div class="audit-pagination">
-      <button><i class="bi bi-chevron-left"></i></button>
+    <div class="audit-mini-pagination">
+      <button type="button"><i class="bi bi-chevron-left"></i></button>
       <strong>1</strong>
-      <button>2</button>
-      <button>3</button>
-      <button><i class="bi bi-chevron-right"></i></button>
+      <button type="button"><i class="bi bi-chevron-right"></i></button>
     </div>
   </div>
 </div>
