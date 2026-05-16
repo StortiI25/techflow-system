@@ -298,7 +298,13 @@ def clientes():
     busca = request.args.get("q","")
     rows = conn.execute("SELECT * FROM clientes WHERE nome LIKE ? OR email LIKE ? OR telefone LIKE ? ORDER BY id DESC", (f"%{busca}%",f"%{busca}%",f"%{busca}%")).fetchall()
     conn.close()
-    return render_template("clientes.html", clientes=rows, busca=busca)
+    
+    total_clientes = conn.execute("SELECT COUNT(*) total FROM clientes").fetchone()["total"]
+    total_compras = conn.execute("SELECT COUNT(*) total FROM movimentacoes WHERE tipo='saida'").fetchone()["total"]
+    valor_total = conn.execute("SELECT COALESCE(SUM(valor_total),0) total FROM movimentacoes WHERE tipo='saida'").fetchone()["total"]
+    ticket_medio = valor_total / total_compras if total_compras else 0
+    return render_template("clientes.html", clientes=rows, busca=busca, total_clientes=total_clientes, total_compras=total_compras, valor_total=valor_total, ticket_medio=ticket_medio)
+
 
 @app.route("/clientes/<int:id>")
 @login_required
