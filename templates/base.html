@@ -82,6 +82,27 @@
   {% block public %}{% endblock %}
 {% endif %}
 <div vw class="enabled"><div vw-access-button class="active"></div><div vw-plugin-wrapper><div class="vw-plugin-top-wrapper"></div></div></div>
+
+{% if usuario_nome %}
+<nav class="mobile-bottom-nav">
+  <a class="{% if request.path == '/dashboard' %}active{% endif %}" href="/dashboard">
+    <i class="bi bi-house-door"></i><span>Início</span>
+  </a>
+  <a class="{% if request.path.startswith('/produtos') %}active{% endif %}" href="/produtos">
+    <i class="bi bi-box-seam"></i><span>Estoque</span>
+  </a>
+  <a class="{% if request.path.startswith('/movimentacoes') %}active{% endif %}" href="/movimentacoes">
+    <i class="bi bi-arrow-left-right"></i><span>Mov.</span>
+  </a>
+  <a class="{% if request.path.startswith('/clientes') %}active{% endif %}" href="/clientes">
+    <i class="bi bi-buildings"></i><span>Clientes</span>
+  </a>
+  <a class="{% if request.path.startswith('/relatorios') %}active{% endif %}" href="/relatorios">
+    <i class="bi bi-file-earmark-bar-graph"></i><span>Relat.</span>
+  </a>
+</nav>
+{% endif %}
+
 <script src="https://vlibras.gov.br/app/vlibras-plugin.js"></script>
 <script>new window.VLibras.Widget("https://vlibras.gov.br/app");</script>
 <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>

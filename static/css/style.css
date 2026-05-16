@@ -2111,3 +2111,453 @@
     grid-template-columns:1fr;
   }
 }
+
+
+/* ==========================================================
+   MODO CELULAR COMPACTO
+   Não altera o layout desktop. Só aplica abaixo de 768px.
+   ========================================================== */
+
+.mobile-bottom-nav{
+  display:none;
+}
+
+@media(max-width:768px){
+
+  body{
+    font-size:14px;
+  }
+
+  .sidebar{
+    width:230px !important;
+    left:-250px;
+    padding:16px 12px !important;
+  }
+
+  .sidebar.active{
+    left:0;
+  }
+
+  .main{
+    margin-left:0 !important;
+    padding-bottom:76px;
+  }
+
+  .content{
+    padding:14px 10px !important;
+  }
+
+  .topbar{
+    height:56px !important;
+    min-height:56px !important;
+    padding:8px 10px !important;
+  }
+
+  .menu-btn{
+    font-size:23px !important;
+  }
+
+  .topbar-actions{
+    gap:8px !important;
+  }
+
+  .theme-button{
+    padding:8px 10px !important;
+    font-size:12px !important;
+    border-radius:10px !important;
+  }
+
+  .theme-button span,
+  .userbox,
+  .topbar-actions .bi-bell{
+    display:none !important;
+  }
+
+  .avatar{
+    width:36px !important;
+    height:36px !important;
+    font-size:14px !important;
+  }
+
+  .logout-btn{
+    display:none !important;
+  }
+
+  .page-title{
+    margin-bottom:16px !important;
+    gap:8px !important;
+  }
+
+  .page-title h1{
+    font-size:26px !important;
+    line-height:1.1 !important;
+  }
+
+  .page-title p{
+    font-size:13px !important;
+  }
+
+  .panel,
+  .mov-card,
+  .mov-table-card,
+  .report-card,
+  .users-table-card,
+  .audit-filter-panel,
+  .audit-main-card,
+  .clients-table-card,
+  .clients-summary{
+    padding:14px !important;
+    border-radius:14px !important;
+  }
+
+  .kpi-grid,
+  .client-kpis,
+  .mov-kpis,
+  .report-kpis,
+  .user-kpis,
+  .audit-cards{
+    grid-template-columns:1fr 1fr !important;
+    gap:10px !important;
+  }
+
+  .kpi-card,
+  .client-kpi-card,
+  .mov-kpi-card,
+  .report-kpi-card,
+  .user-kpi-card,
+  .audit-card{
+    padding:12px !important;
+    gap:10px !important;
+    border-radius:14px !important;
+  }
+
+  .kpi-card .icon,
+  .client-kpi-icon,
+  .mov-kpi-icon,
+  .report-kpi-icon,
+  .user-kpi-icon,
+  .audit-card-icon{
+    width:42px !important;
+    height:42px !important;
+    font-size:20px !important;
+    border-radius:13px !important;
+  }
+
+  .kpi-card h3,
+  .client-kpi-card h3,
+  .mov-kpi-card h3,
+  .report-kpi-card h3,
+  .user-kpi-card h3,
+  .audit-card h3{
+    font-size:18px !important;
+  }
+
+  .kpi-card p,
+  .client-kpi-card p,
+  .mov-kpi-card p,
+  .report-kpi-card p,
+  .user-kpi-card p,
+  .audit-card p{
+    font-size:11px !important;
+  }
+
+  .search-bar,
+  .client-toolbar,
+  .audit-filter-grid,
+  .mov-filters{
+    grid-template-columns:1fr !important;
+    flex-direction:column !important;
+    gap:10px !important;
+  }
+
+  .search-bar .btn,
+  .client-toolbar .btn,
+  .toolbar-btn,
+  .new-client-btn,
+  .audit-filter-grid .btn{
+    width:100% !important;
+    min-height:42px !important;
+    justify-content:center !important;
+  }
+
+  .form-control,
+  select,
+  textarea{
+    min-height:42px !important;
+    padding:10px 12px !important;
+    font-size:13px !important;
+    border-radius:10px !important;
+  }
+
+  textarea{
+    min-height:76px !important;
+  }
+
+  .row.g-4{
+    --bs-gutter-y: .85rem;
+    --bs-gutter-x: .85rem;
+  }
+
+  .products-grid{
+    grid-template-columns:repeat(2,minmax(0,1fr)) !important;
+    gap:10px !important;
+  }
+
+  .product-card{
+    min-height:300px !important;
+    border-radius:13px !important;
+  }
+
+  .product-image{
+    height:105px !important;
+  }
+
+  .product-image i{
+    font-size:42px !important;
+  }
+
+  .product-info{
+    padding:10px !important;
+    gap:7px !important;
+  }
+
+  .product-info h5{
+    font-size:12px !important;
+    line-height:1.2 !important;
+    min-height:32px !important;
+  }
+
+  .product-code,
+  .category-pill{
+    font-size:9px !important;
+  }
+
+  .product-price{
+    font-size:17px !important;
+  }
+
+  .stock-row{
+    font-size:11px !important;
+    padding:6px 7px !important;
+  }
+
+  .product-actions{
+    grid-template-columns:1fr !important;
+    gap:6px !important;
+  }
+
+  .product-actions .btn-success{
+    grid-column:auto !important;
+  }
+
+  .product-actions .btn{
+    font-size:10px !important;
+    padding:6px 4px !important;
+    min-height:32px !important;
+  }
+
+  .mov-layout{
+    grid-template-columns:1fr !important;
+    gap:12px !important;
+  }
+
+  .mov-left{
+    display:flex !important;
+    flex-direction:column !important;
+    gap:12px !important;
+  }
+
+  .mov-two-cols{
+    grid-template-columns:1fr !important;
+    gap:8px !important;
+  }
+
+  .mov-table-header,
+  .users-table-header,
+  .audit-filter-top,
+  .audit-main-header,
+  .report-card-header,
+  .clients-footer,
+  .audit-bottom{
+    flex-direction:column !important;
+    align-items:flex-start !important;
+    gap:10px !important;
+  }
+
+  .table-responsive{
+    overflow-x:auto !important;
+    -webkit-overflow-scrolling:touch;
+  }
+
+  .table-tech,
+  .clients-table,
+  .mov-table,
+  .report-table,
+  .users-table,
+  .audit-table{
+    min-width:760px !important;
+  }
+
+  .table-tech th,
+  .table-tech td,
+  .clients-table th,
+  .clients-table td,
+  .mov-table th,
+  .mov-table td,
+  .report-table th,
+  .report-table td,
+  .users-table th,
+  .users-table td,
+  .audit-table th,
+  .audit-table td{
+    padding:9px 8px !important;
+    font-size:12px !important;
+  }
+
+  .client-actions,
+  .user-actions{
+    gap:5px !important;
+  }
+
+  .action-history{
+    padding:7px 9px !important;
+    font-size:11px !important;
+  }
+
+  .icon-action,
+  .user-actions button,
+  .mov-eye{
+    width:32px !important;
+    height:32px !important;
+  }
+
+  .reports-grid,
+  .reports-bottom,
+  .summary-grid,
+  .hierarchy-panel{
+    grid-template-columns:1fr !important;
+    gap:12px !important;
+  }
+
+  .audit-timeline-item{
+    grid-template-columns:38px 1fr !important;
+    gap:10px !important;
+  }
+
+  .audit-dot{
+    width:38px !important;
+    height:38px !important;
+    font-size:16px !important;
+    border-radius:12px !important;
+  }
+
+  .audit-event{
+    padding:12px !important;
+  }
+
+  .audit-event-top{
+    flex-direction:column !important;
+    gap:8px !important;
+  }
+
+  .audit-date{
+    white-space:normal !important;
+    font-size:12px !important;
+  }
+
+  .profile-card{
+    padding:22px !important;
+  }
+
+  .profile-avatar{
+    width:80px !important;
+    height:80px !important;
+    font-size:32px !important;
+  }
+
+  .sidebar-footer{
+    padding-top:14px !important;
+  }
+
+  .brand{
+    font-size:20px !important;
+  }
+
+  .brand i{
+    font-size:24px !important;
+  }
+
+  .nav-menu{
+    margin-top:22px !important;
+    gap:5px !important;
+  }
+
+  .nav-menu a{
+    padding:10px !important;
+    font-size:13px !important;
+  }
+
+  /* menu inferior opcional no celular */
+  .mobile-bottom-nav{
+    display:grid;
+    grid-template-columns:repeat(5,1fr);
+    position:fixed;
+    left:10px;
+    right:10px;
+    bottom:10px;
+    height:58px;
+    background:var(--surface);
+    border:1px solid var(--border);
+    border-radius:18px;
+    box-shadow:var(--shadow);
+    z-index:1200;
+    overflow:hidden;
+  }
+
+  .mobile-bottom-nav a{
+    display:flex;
+    flex-direction:column;
+    align-items:center;
+    justify-content:center;
+    gap:2px;
+    color:var(--muted);
+    font-size:10px;
+    font-weight:800;
+  }
+
+  .mobile-bottom-nav a i{
+    font-size:18px;
+  }
+
+  .mobile-bottom-nav a.active{
+    color:var(--primary);
+    background:rgba(109,92,255,.10);
+  }
+}
+
+@media(max-width:430px){
+  .kpi-grid,
+  .client-kpis,
+  .mov-kpis,
+  .report-kpis,
+  .user-kpis,
+  .audit-cards{
+    grid-template-columns:1fr !important;
+  }
+
+  .products-grid{
+    grid-template-columns:1fr 1fr !important;
+  }
+
+  .page-title h1{
+    font-size:23px !important;
+  }
+
+  .content{
+    padding:10px 8px !important;
+  }
+
+  .product-card{
+    min-height:285px !important;
+  }
+}
