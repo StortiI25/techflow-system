@@ -25,7 +25,6 @@
       <a class="{% if request.path.startswith('/usuarios') %}active{% endif %}" href="/usuarios"><i class="bi bi-people"></i> Usuários</a>
       {% endif %}
       <a class="{% if request.path.startswith('/historico') %}active{% endif %}" href="/historico"><i class="bi bi-shield-check"></i> Auditoria</a>
-      <a class="{% if request.path.startswith('/perfil') %}active{% endif %}" href="/perfil"><i class="bi bi-person-circle"></i> Personalização</a>
       <a class="{% if request.path.startswith('/sobre') %}active{% endif %}" href="/sobre"><i class="bi bi-info-circle"></i> Sobre o Projeto</a>
     </nav>
     <div class="sidebar-footer"><div class="footer-icon"><i class="bi bi-universal-access-circle"></i></div><div><strong>EstoqueFlow</strong><small>Sistema Integrado v3.0</small></div></div>
@@ -36,9 +35,39 @@
       <div class="topbar-actions">
         <button class="theme-button" id="themeToggle" type="button"></button>
         <i class="bi bi-bell"></i>
-        <div class="userbox"><strong>{{ usuario_nome }}</strong><small>{{ usuario_perfil }}</small></div>
-        <div class="avatar">{{ usuario_nome[0]|upper }}</div>
-        <a class="btn btn-danger btn-sm logout-btn" href="/logout"><i class="bi bi-box-arrow-right"></i> Sair</a>
+
+        <div class="dropdown">
+          <button class="user-dropdown" type="button" data-bs-toggle="dropdown" aria-expanded="false">
+            <div class="userbox">
+              <strong>{{ usuario_nome }}</strong>
+              <small>{{ usuario_perfil }}</small>
+            </div>
+            <div class="avatar">{{ usuario_nome[0]|upper }}</div>
+            <i class="bi bi-chevron-down"></i>
+          </button>
+
+          <ul class="dropdown-menu dropdown-menu-end custom-dropdown">
+            <li>
+              <a class="dropdown-item" href="/perfil">
+                <i class="bi bi-person-circle"></i>
+                Personalização
+              </a>
+            </li>
+            <li>
+              <a class="dropdown-item" href="/perfil">
+                <i class="bi bi-gear"></i>
+                Configurações
+              </a>
+            </li>
+            <li><hr class="dropdown-divider"></li>
+            <li>
+              <a class="dropdown-item text-danger" href="/logout">
+                <i class="bi bi-box-arrow-right"></i>
+                Sair
+              </a>
+            </li>
+          </ul>
+        </div>
       </div>
     </header>
     <section class="content">
