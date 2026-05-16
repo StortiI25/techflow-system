@@ -1,1 +1,228 @@
-{% extends "base.html" %}{% block content %}<div class="page-title"><div><h1>Movimentações</h1><p>Entradas, saídas e bloqueio de estoque negativo.</p></div></div><div class="row g-4"><div class="col-lg-4"><div class="panel mb-4"><h4>Código de barras</h4><input class="form-control" id="barcodeInput" autofocus placeholder="Bipe ou digite o código"></div><form method="post" class="panel"><h4>Nova movimentação</h4><select class="form-control mb-3" name="produto_id" required><option value="">Produto</option>{% for p in produtos %}<option value="{{p.id}}" {% if produto_id and produto_id|int == p.id %}selected{% endif %}>{{p.nome}} — Estoque: {{p.estoque}}</option>{% endfor %}</select><select class="form-control mb-3" name="tipo" id="tipoMov"><option value="entrada">Entrada</option><option value="saida">Saída</option></select><select class="form-control mb-3" name="motivo" id="motivoMov"></select><select class="form-control mb-3" name="cliente_id"><option value="">Cliente vinculado</option>{% for c in clientes %}<option value="{{c.id}}">{{c.nome}}</option>{% endfor %}</select><input class="form-control mb-3" name="quantidade" type="number" min="1" placeholder="Quantidade" required><textarea class="form-control mb-3" name="observacao" placeholder="Observação"></textarea><button class="btn btn-primary w-100">Registrar</button></form></div><div class="col-lg-8"><div class="panel table-responsive"><h4>Histórico</h4><table class="table table-tech"><thead><tr><th>Data</th><th>Produto</th><th>Tipo</th><th>Motivo</th><th>Qtd</th><th>Cliente</th><th>Usuário</th></tr></thead><tbody>{% for m in movimentos %}<tr><td>{{m.data_movimentacao}}</td><td>{{m.produto}}</td><td><span class="badge bg-{{ 'success' if m.tipo=='entrada' else 'danger' }}">{{m.tipo}}</span></td><td>{{m.motivo}}</td><td>{{m.quantidade}}</td><td>{{m.cliente or '-'}}</td><td>{{m.usuario or '-'}}</td></tr>{% endfor %}</tbody></table></div></div></div>{% endblock %}{% block scripts %}<script src="{{url_for('static',filename='js/movimentacoes.js')}}"></script>{% endblock %}
+
+{% extends "base.html" %}
+{% block content %}
+
+<div class="page-title mov-title">
+  <div>
+    <h1>Movimentações</h1>
+    <p>Entradas, saídas e bloqueio de estoque negativo.</p>
+  </div>
+</div>
+
+<div class="mov-kpis">
+  <div class="mov-kpi-card purple">
+    <div class="mov-kpi-icon"><i class="bi bi-box-arrow-in-down"></i></div>
+    <div>
+      <small>Movimentações hoje</small>
+      <h3>{{ mov_hoje or 0 }}</h3>
+      <p>Total de registros</p>
+    </div>
+  </div>
+
+  <div class="mov-kpi-card green">
+    <div class="mov-kpi-icon"><i class="bi bi-arrow-down-circle"></i></div>
+    <div>
+      <small>Entradas hoje</small>
+      <h3>{{ entradas_hoje or 0 }}</h3>
+      <p>Total de entradas</p>
+    </div>
+  </div>
+
+  <div class="mov-kpi-card red">
+    <div class="mov-kpi-icon"><i class="bi bi-arrow-up-circle"></i></div>
+    <div>
+      <small>Saídas hoje</small>
+      <h3>{{ saidas_hoje or 0 }}</h3>
+      <p>Total de saídas</p>
+    </div>
+  </div>
+
+  <div class="mov-kpi-card blue">
+    <div class="mov-kpi-icon"><i class="bi bi-boxes"></i></div>
+    <div>
+      <small>Estoque atualizado</small>
+      <h3>{{ estoque_total or 0 }}</h3>
+      <p>Produtos em estoque</p>
+    </div>
+  </div>
+</div>
+
+<div class="mov-layout">
+  <div class="mov-left">
+    <div class="mov-card barcode-card">
+      <div class="section-label">
+        <i class="bi bi-upc-scan"></i>
+        Código de barras
+      </div>
+      <div class="barcode-input-wrap">
+        <i class="bi bi-search"></i>
+        <input id="barcodeInput" autofocus placeholder="Bipe ou digite o código">
+      </div>
+      <small>Leitores USB funcionam como teclado rápido.</small>
+    </div>
+
+    <form method="post" class="mov-card mov-form">
+      <div class="section-label">
+        <i class="bi bi-plus-square"></i>
+        Nova movimentação
+      </div>
+
+      <label>Tipo</label>
+      <select class="form-control" name="tipo" id="tipoMov" required>
+        <option value="entrada">Entrada</option>
+        <option value="saida">Saída</option>
+      </select>
+
+      <label>Produto</label>
+      <select class="form-control" name="produto_id" required>
+        <option value="">Buscar produto por código, nome ou barcode</option>
+        {% for p in produtos %}
+          <option value="{{ p.id }}" {% if produto_id and produto_id|int == p.id %}selected{% endif %}>
+            {{ p.nome }} — {{ p.codigo_barras }} — Estoque: {{ p.estoque }}
+          </option>
+        {% endfor %}
+      </select>
+
+      <label>Motivo</label>
+      <select class="form-control" name="motivo" id="motivoMov" required></select>
+
+      <label>Cliente opcional</label>
+      <select class="form-control" name="cliente_id">
+        <option value="">Buscar cliente</option>
+        {% for c in clientes %}
+          <option value="{{ c.id }}">{{ c.nome }}</option>
+        {% endfor %}
+      </select>
+
+      <div class="mov-two-cols">
+        <div>
+          <label>Quantidade</label>
+          <input class="form-control" name="quantidade" type="number" min="1" placeholder="Ex: 10" required>
+        </div>
+        <div>
+          <label>Data</label>
+          <input class="form-control" type="text" value="Hoje" disabled>
+        </div>
+      </div>
+
+      <label>Observação</label>
+      <textarea class="form-control" name="observacao" placeholder="Observações opcionais"></textarea>
+
+      <button class="btn btn-primary w-100 mov-submit">
+        <i class="bi bi-arrow-left-right"></i>
+        Registrar movimentação
+      </button>
+
+      <div class="mov-hint">
+        <i class="bi bi-lock"></i>
+        Saídas não podem exceder o estoque disponível.
+      </div>
+    </form>
+  </div>
+
+  <div class="mov-right">
+    <div class="mov-table-card">
+      <div class="mov-table-header">
+        <div class="section-label">
+          <i class="bi bi-clock-history"></i>
+          Histórico de movimentações
+        </div>
+
+        <div class="mov-filters">
+          <button type="button"><i class="bi bi-calendar3"></i> Hoje</button>
+          <button type="button">Todos os tipos <i class="bi bi-chevron-down"></i></button>
+          <button type="button">Todos os motivos <i class="bi bi-chevron-down"></i></button>
+          <button type="button"><i class="bi bi-funnel"></i> Filtros</button>
+        </div>
+      </div>
+
+      <div class="table-responsive">
+        <table class="table mov-table">
+          <thead>
+            <tr>
+              <th>Data</th>
+              <th>Produto</th>
+              <th>Tipo</th>
+              <th>Motivo</th>
+              <th>Qtd</th>
+              <th>Cliente</th>
+              <th>Usuário</th>
+              <th>Ações</th>
+            </tr>
+          </thead>
+
+          <tbody>
+          {% for m in movimentos %}
+            <tr>
+              <td>
+                <strong>{{ m.data_movimentacao }}</strong>
+                <small>10:45</small>
+              </td>
+
+              <td>
+                <div class="mov-product">
+                  <div class="mov-product-thumb">
+                    {% if 'Notebook' in m.produto %}
+                      <i class="bi bi-laptop"></i>
+                    {% elif 'Monitor' in m.produto %}
+                      <i class="bi bi-display"></i>
+                    {% elif 'Teclado' in m.produto %}
+                      <i class="bi bi-keyboard"></i>
+                    {% elif 'Mouse' in m.produto %}
+                      <i class="bi bi-mouse"></i>
+                    {% elif 'SSD' in m.produto or 'Memória' in m.produto %}
+                      <i class="bi bi-device-ssd"></i>
+                    {% elif 'Impressora' in m.produto %}
+                      <i class="bi bi-printer"></i>
+                    {% elif 'Cadeira' in m.produto %}
+                      <i class="bi bi-chair"></i>
+                    {% else %}
+                      <i class="bi bi-box-seam"></i>
+                    {% endif %}
+                  </div>
+                  <div>
+                    <strong>{{ m.produto }}</strong>
+                    <small>{{ m.produto_id }}</small>
+                  </div>
+                </div>
+              </td>
+
+              <td>
+                <span class="mov-type {{ m.tipo }}">
+                  {{ 'Entrada' if m.tipo == 'entrada' else 'Saída' }}
+                </span>
+              </td>
+
+              <td>{{ m.motivo }}</td>
+              <td><strong>{{ m.quantidade }}</strong></td>
+              <td>{{ m.cliente or '-' }}</td>
+              <td>{{ m.usuario or '-' }}</td>
+              <td>
+                <button class="mov-eye" type="button">
+                  <i class="bi bi-eye"></i>
+                </button>
+              </td>
+            </tr>
+          {% endfor %}
+          </tbody>
+        </table>
+      </div>
+
+      <div class="mov-pagination">
+        <span>Mostrando 1 a {{ movimentos|length }} de {{ movimentos|length }} movimentações</span>
+        <div>
+          <button><i class="bi bi-chevron-left"></i></button>
+          <strong>1</strong>
+          <button>2</button>
+          <button>3</button>
+          <button><i class="bi bi-chevron-right"></i></button>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+{% endblock %}
+{% block scripts %}
+<script src="{{ url_for('static', filename='js/movimentacoes.js') }}"></script>
+{% endblock %}

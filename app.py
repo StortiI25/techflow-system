@@ -441,7 +441,13 @@ def movimentacoes():
         ORDER BY m.id DESC LIMIT 80
     """).fetchall()
     conn.close()
-    return render_template("movimentacoes.html", produtos=produtos, clientes=clientes, movimentos=rows, produto_id=produto_id)
+    
+    mov_hoje = conn.execute("SELECT COUNT(*) total FROM movimentacoes WHERE data_movimentacao=?", (today_iso(),)).fetchone()["total"]
+    entradas_hoje = conn.execute("SELECT COALESCE(SUM(quantidade),0) total FROM movimentacoes WHERE tipo='entrada' AND data_movimentacao=?", (today_iso(),)).fetchone()["total"]
+    saidas_hoje = conn.execute("SELECT COALESCE(SUM(quantidade),0) total FROM movimentacoes WHERE tipo='saida' AND data_movimentacao=?", (today_iso(),)).fetchone()["total"]
+    estoque_total = conn.execute("SELECT COALESCE(SUM(estoque),0) total FROM produtos").fetchone()["total"]
+    return render_template("movimentacoes.html", produtos=produtos, clientes=clientes, movimentos=rows, produto_id=produto_id, mov_hoje=mov_hoje, entradas_hoje=entradas_hoje, saidas_hoje=saidas_hoje, estoque_total=estoque_total)
+
 
 @app.route("/relatorios")
 @login_required
